@@ -17,7 +17,7 @@ namespace TestCase {
 	void TestClass::add(int a) {
 		count += a;
 	}
-	void TestClass::substract(int a) {
+	void TestClass::subtract(int a) {
 		count -= a;
 	}
 

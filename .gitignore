@@ -8,6 +8,9 @@ Release
 .exe
 .sdf
 .opensdf
-_gen.cpp
-_gen.cs
+*_gen.cpp
+*_gen.cs
 packages/
+*.suo
+*.opensdf
+*.sdf

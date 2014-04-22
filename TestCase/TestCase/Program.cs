@@ -13,7 +13,7 @@ namespace TestCase {
                     test.add(i);
                 }
                 for (int i = 0; i < 10; ++i) {
-                    test.substract(i);
+                    test.subtract(i);
                 }
                 Console.WriteLine(test.method());
             }
