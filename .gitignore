@@ -1,0 +1,13 @@
+obj
+bin
+Debug
+Release
+.suo
+.user
+.dll
+.exe
+.sdf
+.opensdf
+_gen.cpp
+_gen.cs
+packages/
