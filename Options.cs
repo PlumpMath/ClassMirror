@@ -4,20 +4,23 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Cursor = ClangSharp.Cursor;
 
 namespace ClassMirror {
     class Options {
         static private readonly char _optionSeparator = ':';
-        static private bool _isWatching = false;
+        // TODO: static private bool _isWatching = false;
+        // TODO: static private Dictionary<string, FileSystemWatcher> _fsws = new Dictionary<string, FileSystemWatcher>();
         static private Exception _error;
-        static private Dictionary<string, FileSystemWatcher> _fsws = new Dictionary<string, FileSystemWatcher>();
 
         static public event Action<Options> ConfigurationChanged = o => { };
         static public event Action<Exception> ConfigurationError = e => { };
 
         public IList<Source> Sources = new List<Source>();
+        public string ConfigFile;
         public string DllName;
         public string BaseDir;
+        public List<string> Includes = new List<string>();
         public string Prefix = "extern \"C\"";
 
         private Options() { }
@@ -26,6 +29,12 @@ namespace ClassMirror {
             if (_error != null) {
                 throw _error;
             }
+        }
+
+        public bool CanInterop(Member member) {
+            return (!member.Type.EndsWith("*") || Sources.Any(s => s.Name == member.Type.TrimEnd('*'))) &&
+                member.Params.All(p => !string.IsNullOrEmpty(p.Item2)) &&
+                !member.Name.Contains(' ');
         }
 
         static public void StartWatching(string path) {
@@ -44,12 +53,12 @@ namespace ClassMirror {
                         _error = exception;
                         ConfigurationError(exception);
                     }
-                }   
+                }
             };
         }
 
         static private string SplitOptionLine(string optionLine, int index) {
-            var tokens = optionLine.Split(new [] { _optionSeparator }, 2);
+            var tokens = optionLine.Split(new[] { _optionSeparator }, 2);
             if (tokens.Length != 2) {
                 throw new Exception(string.Format("Configuration line: {0} could not be parsed, format is 'option: value'"));
             }
@@ -57,7 +66,7 @@ namespace ClassMirror {
         }
 
         static private string GetKey(string optionLine) {
-            return SplitOptionLine(optionLine, 0);            
+            return SplitOptionLine(optionLine, 0);
         }
 
         static private string GetValue(string optionLine) {
@@ -72,6 +81,10 @@ namespace ClassMirror {
             Prefix = name.Trim();
         }
 
+        private void SaveIncludes(string includes) {
+            Includes.AddRange(includes.Split(' '));
+        }
+
         private void ParseSource(string options) {
             var tokens = options.Split(' ');
             if (tokens.Length != 4) {
@@ -83,8 +96,9 @@ namespace ClassMirror {
         }
 
         static public Options Load(string filename) {
-            var options = new Options { 
-                BaseDir = Path.Combine(Directory.GetCurrentDirectory(), Path.GetDirectoryName(filename))
+            var options = new Options {
+                BaseDir = Path.Combine(Directory.GetCurrentDirectory(), Path.GetDirectoryName(filename)),
+                ConfigFile = filename
             };
             var settings = new[] {
                 new {
@@ -98,6 +112,10 @@ namespace ClassMirror {
                 new {
                     Key = "prefix",
                     Parse = new Action<string>(options.SavePrefix)
+                },
+                new {
+                    Key = "includes",
+                    Parse = new Action<string>(options.SaveIncludes)
                 }
             };
             var config = File.ReadAllLines(filename).ToLookup(GetKey, GetValue);
@@ -112,6 +130,8 @@ namespace ClassMirror {
             if (options.Sources.Count == 0) {
                 throw new Exception("No sources found");
             }
+            options.Includes = options.Includes.ConvertAll(i => Path.Combine(options.BaseDir, i));
+            options.Includes.Add(options.BaseDir);
             return options;
         }
     }
