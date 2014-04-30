@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.CodeDom;
 
 namespace ClassMirror {
     class GeneratedSource {
@@ -12,9 +13,53 @@ namespace ClassMirror {
         public Options Options;
         public IList<Member> Methods;
         public IList<Member> Ctors;
+        protected static readonly Dictionary<string, Type> Types = new Dictionary<string,Type> {
+            { "void", typeof(void) },
+            { "int", typeof(int) },
+            { "float", typeof(float) },
+            { "double", typeof(double) },
+            { "char*", typeof(string) },
+            { "bool", typeof(bool) } 
+        };
 
-        protected static string CreateParameterString(IEnumerable<Tuple<string, string>> parameters) {
-            return string.Join(", ", parameters.Select(p => string.Format("{0} {1}", p.Item1, p.Item2)));
+        public bool IsParsedType(string type) {
+            return Options.Sources.Any(s => s.Name == type.TrimEnd('*'));
+        }
+
+        public static CodeTypeReference GetPublicManagedType(string nativeType) {
+            if (string.IsNullOrEmpty(nativeType)) {
+                throw new Exception("Type is unknown");
+            }
+            Type result;
+            if (Types.TryGetValue(nativeType, out result)) {
+                return new CodeTypeReference(result);
+            }
+            if (nativeType.EndsWith("*")) {
+                return new CodeTypeReference(nativeType.TrimEnd('*'));
+            }
+            throw new Exception("Could not map type " + nativeType);
+        }
+
+        public static Type GetManagedType(string nativeType) {
+            if (string.IsNullOrEmpty(nativeType)) {
+                throw new Exception("Type is unknown");
+            }
+            Type result;
+            if (Types.TryGetValue(nativeType, out result)) {
+                return result;
+            }
+            if (nativeType.EndsWith("*")) {
+                return typeof(IntPtr);
+            }
+            throw new Exception("Could not map type " + nativeType);
+        }
+
+        public static string GetInteropReturnType(string nativeType) {
+            return nativeType.EndsWith("*") ? "IntPtr" : nativeType;
+        }
+
+        public static bool HasType(string nativeType) {
+            return nativeType.EndsWith("*") || Types.ContainsKey(nativeType);
         }
 
         protected static string Return(string type) {
