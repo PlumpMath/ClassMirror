@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -108,10 +108,10 @@ namespace ClassMirror {
             return from child in type.Children
                    where child.Kind == CursorKind.Constructor
                    select new Member {
-                Params = CreateParams(child),
-                Name = "New" + i++,
-                Type = "IntPtr"
-            };
+                       Params = CreateParams(child),
+                       Name = "New" + i++,
+                       Type = "IntPtr"
+                   };
         }
 
         static List<Tuple<string, string>> CreateParams(Cursor method) {

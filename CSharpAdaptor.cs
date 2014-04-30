@@ -90,7 +90,7 @@ namespace ClassMirror {
                     Name,
                     method.Name,
                     CreateParameterString(parms)
-                ));          
+                ));
             } catch (Exception e) {
                 Console.WriteLine("Could not parse {0}: {1}, continuing", method.Name, e.Message);
                 return null;
@@ -105,7 +105,7 @@ namespace ClassMirror {
             return paramName;
         }
 
-        private string GetParamName(string paramName) {
+        private static string GetParamName(string paramName) {
             return paramName == string.Empty ? "unused" : paramName;
         }
 
@@ -154,7 +154,7 @@ namespace ClassMirror {
             throw new Exception("Could not parse " + nativeType);
         }
 
-        private string CreateParameterString(IEnumerable<Tuple<string, string>> parameters) {
+        private static string CreateParameterString(IEnumerable<Tuple<string, string>> parameters) {
             return string.Join(", ", parameters.Select(p => string.Format("{0} {1}", GetManagedType(p.Item1), GetParamName(p.Item2))));
         }
 
@@ -222,10 +222,10 @@ namespace ClassMirror {
         public string Generate() {
             var compileUnit = new CodeCompileUnit();
             var ns = new CodeNamespace(Namespace);
-            ns.Imports.AddRange(new [] {
+            ns.Imports.AddRange(new[] {
                 new CodeNamespaceImport("System"),
                 new CodeNamespaceImport("System.Runtime.InteropServices")
-            }); 
+            });
             compileUnit.Namespaces.Add(ns);
             var type = new CodeTypeDeclaration(Name);
             type.BaseTypes.Add(new CodeTypeReference("IDisposable"));

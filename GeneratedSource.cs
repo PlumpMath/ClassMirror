@@ -13,7 +13,7 @@ namespace ClassMirror {
         public Options Options;
         public IList<Member> Methods;
         public IList<Member> Ctors;
-        protected static readonly Dictionary<string, Type> Types = new Dictionary<string,Type> {
+        protected static readonly Dictionary<string, Type> Types = new Dictionary<string, Type> {
             { "void", typeof(void) },
             { "int", typeof(int) },
             { "float", typeof(float) },

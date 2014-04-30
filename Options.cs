@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Cursor=ClangSharp.Cursor;
+using Cursor = ClangSharp.Cursor;
 
 namespace ClassMirror {
     class Options {
@@ -53,12 +53,12 @@ namespace ClassMirror {
                         _error = exception;
                         ConfigurationError(exception);
                     }
-                }   
+                }
             };
         }
 
         static private string SplitOptionLine(string optionLine, int index) {
-            var tokens = optionLine.Split(new [] { _optionSeparator }, 2);
+            var tokens = optionLine.Split(new[] { _optionSeparator }, 2);
             if (tokens.Length != 2) {
                 throw new Exception(string.Format("Configuration line: {0} could not be parsed, format is 'option: value'"));
             }
@@ -96,7 +96,7 @@ namespace ClassMirror {
         }
 
         static public Options Load(string filename) {
-            var options = new Options { 
+            var options = new Options {
                 BaseDir = Path.Combine(Directory.GetCurrentDirectory(), Path.GetDirectoryName(filename)),
                 ConfigFile = filename
             };

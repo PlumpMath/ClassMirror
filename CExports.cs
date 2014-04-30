@@ -34,7 +34,7 @@ namespace ClassMirror {
 		private static string CreateParameterString(IEnumerable<Tuple<string, string>> parameters) {
 			return string.Join(", ", parameters.Select(p => string.Format("{0} {1}", p.Item1, p.Item2)));
 		}
-
+        
         private IEnumerable<Tuple<string, string>> InteropParameter {
             get {
 				yield return Tuple.Create(Name + "*", "instance");
@@ -48,11 +48,7 @@ namespace ClassMirror {
         }
 
         private bool IsValid(Member method) {
-            //if (method.Name == "GetLocation") {
-                return HasType(method.Type) && method.Params.Select(p => p.Item1).All(HasType);
-            //} else {
-            //   return HasType(method.Type);
-            //}
+            return HasType(method.Type) && method.Params.Select(p => p.Item1).All(HasType);
         }
 
         private string UsingNamespace {
@@ -62,9 +58,9 @@ namespace ClassMirror {
         }
 
         private string InteropConstructors {
-            get { 
-                return string.Join(DoubleNewline, Ctors.Select(ctor => 
-                    string.Join(Environment.NewLine, new [] {
+            get {
+                return string.Join(DoubleNewline, Ctors.Select(ctor =>
+                    string.Join(Environment.NewLine, new[] {
                         string.Format("{0} {1}* _{1}_{2}({3}) {{", 
                             Options.Prefix,
                             Name,
